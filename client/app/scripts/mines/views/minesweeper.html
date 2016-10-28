@@ -1,4 +1,19 @@
 <h3>Minesweeper</h3>
+<div ng-repeat="row in clickedBoxes track by $index" class="row">
+  <a ng-repeat="clicked in row track by $index"
+     class="whiteCell {{clicked ? 'clicked' : ''}} {{state[$parent.$index][$index] === 'Bomb!' ? 'bomb' : ''}}"
+     ng-click="clickCell($parent.$index, $index)">
+    <img ng-if="clicked && state[$parent.$index][$index] === 'Bomb!'"
+         src="/images/bomb.png"
+         class="bomb-png" />
+    <span ng-if="clicked && state[$parent.$index][$index] !== 'Bomb!'">
+      {{state[$parent.$parent.$index][$parent.$index]}}
+    </span>
+    <span ng-if="!clicked || clicked && state[$parent.$index][$index] === 'Bomb!'">&nbsp;</span>
+  </a>
+</div>
+<br>
+<div ng-if="bombClicked"><span class="lost">Perdiste!</span></div>
 <br>
 <div>
   <br><a href="#/" class="kataFont">Home</a>
