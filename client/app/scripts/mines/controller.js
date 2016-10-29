@@ -2,7 +2,6 @@
 
 angular.module('Minesweeper')
 .controller('minesweeper', function ($scope, initialState) {
-  $scope.state = [];
   $scope.clickedBoxes = [];
   $scope.bombClicked = false;
 
