@@ -2,44 +2,31 @@
 
 angular.module('Minesweeper')
 .controller('minesweeper', function ($scope, initialState) {
-  initialState = initialState || [];
   $scope.state = [];
   $scope.clickedBoxes = [];
   $scope.bombClicked = false;
 
-  initialState.forEach(function(row) {
-    var colData = [];
-    for (var col = 0; col < initialState.length; col ++) {
-      colData.push(row[col] === '*' ? 'Bomb!' : 0);
-    }
-    $scope.state.push(colData);
-    $scope.clickedBoxes.push(colData.map(function() { return false; }));
+  $scope.state = initialState.map(function(row, rowIndex) {
+    $scope.clickedBoxes.push(row.split('').map(function() {return false;}));
+    return row.split('').map(function(cell) {return cell === '*' ? 'Bomb!' : 0; });
   });
 
   $scope.state = $scope.state.map(function(row, rowIndex) {
     return row.map(function(col, colIndex) {
-      if (col === 'Bomb!') { return col; }
-      return getSurroundingBombs($scope.state, row, col, rowIndex, colIndex);
+      return col === 'Bomb!' ? col : getSurroundingBombs($scope.state, row, col, rowIndex, colIndex);
     });
   });
 
   $scope.clickCell = function(row, col) {
     $scope.clickedBoxes[row][col] = true;
-    $scope.bombClicked = $scope.state[row][col] === 'Bomb!';
+    $scope.bombClicked = $scope.bombClicked || $scope.state[row][col] === 'Bomb!';
   }
-  // ---
 
-  function getSurroundingBombs(initialState, row, col, rowIndex, colIndex) {
-    var surroundingBombs = 0;
-    if (rowIndex > 0 && colIndex > 0 && initialState[rowIndex - 1][colIndex -1] === 'Bomb!') { surroundingBombs++; }
-    if (rowIndex > 0 && initialState[rowIndex - 1][colIndex] === 'Bomb!') { surroundingBombs++; }
-    if (rowIndex > 0 && initialState[rowIndex - 1][colIndex + 1] === 'Bomb!') { surroundingBombs++; }
-    if (colIndex > 0 && initialState[rowIndex][colIndex - 1] === 'Bomb!') { surroundingBombs++; }
-    if (initialState[rowIndex][colIndex + 1] === 'Bomb!') { surroundingBombs++; }
-    if (rowIndex < initialState.length - 1 && colIndex > 0 && initialState[rowIndex + 1][colIndex - 1] === 'Bomb!') { surroundingBombs++; }
-    if (rowIndex < initialState.length - 1  && initialState[rowIndex + 1][colIndex] === 'Bomb!') { surroundingBombs++; }
-    if (rowIndex < initialState.length - 1 && initialState[rowIndex + 1][colIndex + 1] === 'Bomb!') { surroundingBombs++; }
-    return (surroundingBombs);
+  function getSurroundingBombs(state, row, col, rowIndex, colIndex) {
+    return [].concat.apply([], state
+    .slice(Math.max(rowIndex - 1, 0), rowIndex + 2)
+    .map(function(row) { return row.slice(Math.max(colIndex - 1, 0), colIndex + 2)}))
+    .filter(function(cell) { return cell === 'Bomb!'; }).length;
   }
 })
 .config(function ($routeProvider) {

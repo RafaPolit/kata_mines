@@ -9,21 +9,14 @@ describe('Controller: minesweeper', function () {
   var scope;
   var initialState
 
-  function instantiateController() {
-    inject(function ($controller) {
-      controller = $controller('minesweeper', { $scope: scope, initialState: initialState });
-    });
-  }
-
-  beforeEach(inject(function ($rootScope) {
+  beforeEach(inject(function ($rootScope, $controller) {
     scope = $rootScope.$new();
-    instantiateController();
+    initialState = ['*..', '...', '.*.'];
+    controller = $controller('minesweeper', { $scope: scope, initialState: initialState });
   }));
 
   describe('On instance', function () {
     it('should put into scope the initial state', function () {
-      initialState = ['*..', '...', '.*.'];
-      instantiateController();
       expect(scope.state.length).toBe(3);
       expect(scope.state).toEqual([['Bomb!', 1, 0], [2, 2, 1], [1, 'Bomb!', 1]]);
     });
@@ -47,11 +40,13 @@ describe('Controller: minesweeper', function () {
       expect(scope.clickedBoxes[1][2]).toBe(true);
     });
 
-    it('should set the bombClicked state to true', function() {
+    it('should set the bombClicked state to true (and never loose it)', function() {
       expect(scope.bombClicked).toBe(false);
       scope.clickCell(0,1);
       expect(scope.bombClicked).toBe(false);
       scope.clickCell(0,0);
+      expect(scope.bombClicked).toBe(true);
+      scope.clickCell(0,1);
       expect(scope.bombClicked).toBe(true);
     })
   });
